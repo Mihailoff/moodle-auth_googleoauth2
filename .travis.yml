@@ -24,7 +24,8 @@ env:
 before_script:
  - git clone git://github.com/moodle/moodle ../moodle && cd ../moodle
  - git checkout $MOODLE_VERSION
- - composer self-update
+ - composer self-update -q
+ - if [ -n "$GH_TOKEN" ]; then composer config github-oauth.github.com ${GH_TOKEN}; fi;c
  - mv ../moodle-auth_googleoauth2 auth/googleoauth2
  - cp config-dist.php config.php
  - sh -c "sed -i -e s/'password'/''/ -e s/example.com/localhost/ -e s%192.168.1.250%localhost% -e s%/home/example%$HOME% -e 's%\(\$CFG.*bht\)%\n\1%' -e 's%\(\$CFG.*behat_wwwroot.*http://127\)%\n\1%' config.php"
@@ -35,7 +36,6 @@ before_script:
  - "(php -S localhost:8000 &) 2> /dev/null > /dev/null"
  - "wget http://selenium-release.storage.googleapis.com/2.43/selenium-server-standalone-2.43.1.jar"
  - "java -jar selenium-server-standalone-2.43.1.jar &"
- - echo "{\"config\":{\"github-oauth\":{\"github.com\":\"$GITHUBTOKEN\"}}}" > ~/.composer/config.json
  - cd auth/googleoauth2
  - curl -sS https://getcomposer.org/installer | php
  - php composer.phar install
